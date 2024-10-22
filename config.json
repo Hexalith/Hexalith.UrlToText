@@ -2,7 +2,8 @@
   "MaxDepth": 3,
   "MaxConcurrentRequests": 10,
   "AcceptExternalLinks": false,
-  "OutputFormat": "txt",
-  "OutputLocation": "scraped/openwebui",
+  "OutputName": "OpenWebUI",
+  "OutputFormat": "pdf",
+  "OutputLocation": "scraped",
   "StartUrl": "https://docs.openwebui.com/"
 }

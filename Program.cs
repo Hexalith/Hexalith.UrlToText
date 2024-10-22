@@ -11,61 +11,48 @@ using WebCrawler;
 
 try
 {
-    Console.WriteLine("Web crawler application starting...");
-
     // Load configuration
     var config = new ConfigurationManager("config.json");
-    Console.WriteLine($"Configuration loaded. Max depth: {config.MaxDepth}, Output format: {config.OutputFormat}");
 
     // Ensure storage directory exists
-    Directory.CreateDirectory(config.OutputLocation);
-    Console.WriteLine($"Storage directory created/verified: {config.OutputLocation}");
+    DirectoryInfo outputDirectory = Directory.CreateDirectory(Path.Combine(config.OutputLocation, config.OutputName));
 
     // Initialize crawler
     var crawler = new Crawler(
         config.MaxDepth,
         10, // 10 concurrent requests
-        config.OutputLocation,
+        outputDirectory.FullName,
         config.AcceptExternalLinks, // Add this line
         config.StartUrl // Add this line
     );
-    Console.WriteLine("Crawler initialized");
 
     Console.WriteLine("Starting web crawl...");
     await crawler.CrawlAsync(config.StartUrl);
     Console.WriteLine("Web crawl completed.");
 
-    Console.WriteLine("About to retrieve stored content...");
-    
     // Retrieve all stored content
-    Console.WriteLine("Retrieving stored content...");
-    var storageManager = new StorageManager(config.OutputLocation); // Use the output location from config
-    Console.WriteLine($"StorageManager instance created with path: {config.OutputLocation}");
-    
-    Console.WriteLine("Calling RetrieveAllContentsAsync...");
-    var contents = await storageManager.RetrieveAllContentsAsync();
+    Console.WriteLine($"Retrieving stored content to '{outputDirectory.FullName}'...");
+    var storageManager = new StorageManager(outputDirectory.FullName); // Use the output location from config
+
+    IEnumerable<ProcessedContent> contents = await storageManager.RetrieveAllContentsAsync();
     Console.WriteLine($"Retrieved {contents.Count()} content items");
 
     // Generate output
-    Console.WriteLine($"Generating output in {config.OutputFormat} format...");
+    string outputFile = Path.Combine(config.OutputLocation, config.OutputName, $"{config.OutputName}.{config.OutputFormat}");
     if (config.OutputFormat.Equals("txt", StringComparison.OrdinalIgnoreCase))
     {
-        Console.WriteLine("Generating text file...");
-        await OutputGenerator.GenerateTextFileAsync(contents, config.OutputLocation);
-        Console.WriteLine("Text file generated.");
+        await OutputGenerator.GenerateTextFileAsync(contents, outputFile);
     }
     else if (config.OutputFormat.Equals("pdf", StringComparison.OrdinalIgnoreCase))
     {
-        Console.WriteLine("Generating PDF file...");
-        await OutputGenerator.GeneratePdfAsync(contents, config.OutputLocation);
-        Console.WriteLine("PDF file generated.");
+        await OutputGenerator.GeneratePdfAsync(contents, outputFile);
     }
     else
     {
         throw new ArgumentException("Unsupported output format specified in configuration.");
     }
+    Console.WriteLine($"File '{outputFile}' generated.");
 
-    Console.WriteLine($"Output generated at: {config.OutputLocation}");
     Console.WriteLine("Web crawler application completed successfully.");
 }
 catch (Exception ex)

@@ -16,7 +16,20 @@ public static class OutputGenerator
             _ = sb.AppendLine(new string('-', 80));
         }
 
-        await File.WriteAllTextAsync(outputPath, sb.ToString());
+        try
+        {
+            await File.WriteAllTextAsync(outputPath, sb.ToString());
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            Console.Error.WriteLine($"Access to the path '{outputPath}' is denied. Please check the directory permissions.");
+            Console.Error.WriteLine(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"An error occurred while writing to the file: {ex.Message}");
+            Console.Error.WriteLine(ex.StackTrace);
+        }
     }
 
     public static Task GeneratePdfAsync(IEnumerable<ProcessedContent> contents, string outputPath) =>

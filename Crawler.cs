@@ -15,6 +15,7 @@ public class Crawler
     private readonly IBrowsingContext _context;
     private readonly HashSet<string> _visitedUrls;
     private readonly int _maxDepth;
+    private readonly string _outputLocation;
     private readonly SemaphoreSlim _semaphore;
     private readonly StorageManager _storageManager;
     private readonly bool _acceptExternalLinks;
@@ -25,6 +26,7 @@ public class Crawler
         _context = BrowsingContext.New(Configuration.Default.WithDefaultLoader());
         _visitedUrls = [];
         _maxDepth = maxDepth;
+        _outputLocation = outputLocation;
         _semaphore = new SemaphoreSlim(maxConcurrentRequests);
         _storageManager = new StorageManager(outputLocation);
         _acceptExternalLinks = acceptExternalLinks;
@@ -34,10 +36,10 @@ public class Crawler
 
     private void ClearOutputDirectory()
     {
-        string outputDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "output");
-        if (Directory.Exists(outputDir))
+        if (Directory.Exists(_outputLocation))
         {
-            foreach (string file in Directory.GetFiles(outputDir))
+            // Delete all files and subdirectories in the output directory
+            foreach (string file in Directory.GetFiles(_outputLocation))
             {
                 File.Delete(file);
             }

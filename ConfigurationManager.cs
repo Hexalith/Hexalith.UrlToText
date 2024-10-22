@@ -16,12 +16,14 @@ public class ConfigurationManager
     [DataMember]
     public string OutputFormat { get; set; }
     [DataMember]
+    public string OutputName { get; set; }
+    [DataMember]
     public string OutputLocation { get; set; }
     [DataMember]
     public string StartUrl { get; set; }
 
     public ConfigurationManager()
-        => OutputFormat = OutputLocation = StartUrl = string.Empty;
+        => OutputName = OutputFormat = OutputLocation = StartUrl = string.Empty;
 
     public ConfigurationManager(string configPath)
     {
@@ -45,5 +47,6 @@ public class ConfigurationManager
         OutputLocation = config.OutputLocation;
         StartUrl = config.StartUrl;
         AcceptExternalLinks = config.AcceptExternalLinks;
+        OutputName = config.OutputName;
     }
 }
