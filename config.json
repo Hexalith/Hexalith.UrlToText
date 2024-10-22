@@ -1,0 +1,8 @@
+{
+  "MaxDepth": 3,
+  "MaxConcurrentRequests": 10,
+  "AcceptExternalLinks": false,
+  "OutputFormat": "txt",
+  "OutputLocation": "scraped/openwebui",
+  "StartUrl": "https://docs.openwebui.com/"
+}
